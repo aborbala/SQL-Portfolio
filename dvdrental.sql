@@ -1,23 +1,26 @@
 /* 
-In this query, I used the DVDrental sample dataset provided by PostgreSQL Tutorial (http://www.postgresqltutorial.com/postgresql-sample-database/).
-I rund simple queries to discovery the dataset and find answeres for some questions.
+In this query I use the DVDrental sample dataset provided by the following PostgreSQL Tutorial:
+http://www.postgresqltutorial.com/postgresql-sample-database/
+
+Firstly I manipulate the dataset (insert and update table).
+Afterwards I run queries to discover the dataset and to find answers to some specific questions.
 */
 
 --Data Manipulation
---First, I introduced a new category using the given settings.
+--Firstly, I introduce a new category using the given settings.
 INSERT INTO category (category_id, name, last_update) 
 values ( nextval('category_category_id_seq'::regclass), 'Anime',  now());
 		
---Now, I insert a new film.
+--Now I insert a new film.
 INSERT INTO film (film_id, title, description,  release_year, language_id, rental_duration, rental_rate, length, replacement_cost, rating, last_update, special_features) 
 VALUES (nextval('film_film_id_seq'::regclass), 'Paprika', 'A revolutionary new psychotherapy treatment called dream therapy has been invented. A device called the "DC Mini" allows the user to view peoples dreams.',
 					'2006','3','3','4.99','90','19.99','G'::mpaa_rating, now(),'{"Behind the Scenes"}');
 
---Update: the rating of the newly inserted film must be changes.
+--Update: the rating of the newly inserted film must be changed.
 UPDATE film SET rating = 'R'  WHERE title='Paprika';
 
---Querying the data
---How many film are in the inventory in each categories?
+--Querying data
+--How many films are in the inventory in each category?
 SELECT category.name, COUNT(film.film_id)
 	FROM category 
 	JOIN film_category ON category.category_id=film_category.category_id
@@ -32,7 +35,7 @@ SELECT category.name, COUNT(film.film_id)
 	HAVING sum(payment.amount)> 100
 	ORDER BY 2 DESC;
 		
---Which films ware rented by customer 15, and how long?
+--Which films were rented by customer 15, and how long were those films rented?
 SELECT customer.customer_id AS customer_id, film.title, film.rental_duration, rental.rental_date, rental.return_date, DATE_PART('day', return_date - rental_date) AS rental_time
 	FROM customer
 	JOIN rental USING(customer_id)
@@ -40,7 +43,7 @@ SELECT customer.customer_id AS customer_id, film.title, film.rental_duration, re
 	JOIN film USING(film_id)
 	WHERE customer_id=15;
 
---How many of them were returned back too late and how many days later?
+--How many of the rented films were returned back too late and how many days later?
 SELECT customer.customer_id AS customer_id, film.title, film.rental_duration, rental.rental_date, rental.return_date, 
 		DATE_PART('day', return_date - rental_date) AS rental_time, rental_duration-DATE_PART('day', return_date - rental_date) AS days_of_delay
 	FROM customer
@@ -79,6 +82,3 @@ SELECT film.title, customer_id, first_name, last_name, email
 	ORDER BY 2 DESC
 	LIMIT 3;
 		
-
-
-
